@@ -87,6 +87,9 @@ repositories {
                 password = "${nexus_pw}"
             }
         }
+//     TODO SLA needed?   maven () {
+//            url 'http://mvnrepository.com/repos/atlassian-public'
+//        }
     }
 }
 
@@ -115,6 +118,11 @@ dependencies {
     testCompile('org.springframework.security:spring-security-test')
 
     compile("org.thymeleaf.extras:thymeleaf-extras-springsecurity5")
+
+    // keycloak
+    // TODO SLA check versions
+    compile 'org.keycloak:keycloak-spring-boot-starter:3.1.0.Final'
+    compile 'org.keycloak:keycloak-spring-security-adapter:3.1.0.Final'
 
     //frontend webjars
     compile 'org.webjars.bower:jquery:3.2.1'
