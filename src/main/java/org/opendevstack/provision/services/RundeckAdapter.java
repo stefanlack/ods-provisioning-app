@@ -18,6 +18,7 @@ import com.atlassian.crowd.integration.springsecurity.user.CrowdUserDetailsServi
 import com.fasterxml.jackson.core.type.TypeReference;
 import okhttp3.HttpUrl;
 import org.opendevstack.provision.authentication.CustomAuthenticationManager;
+import org.opendevstack.provision.authentication.ProvisioningAppAuthenticationManager;
 import org.opendevstack.provision.model.ExecutionsData;
 import org.opendevstack.provision.model.ProjectData;
 import org.opendevstack.provision.model.rundeck.Execution;
@@ -28,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -54,9 +56,6 @@ public class RundeckAdapter {
 
   @Autowired
   private RundeckJobStore jobStore;
-
-  @Autowired
-  private CrowdUserDetailsService crowdUserDetailsService;
 
 
   @Value("${rundeck.api.path}")
@@ -110,7 +109,7 @@ public class RundeckAdapter {
   private RestClient client;
 
   @Autowired
-  CustomAuthenticationManager manager;
+  ProvisioningAppAuthenticationManager manager;
 
   public List<Job> getQuickstarter() {
     try {
@@ -141,7 +140,7 @@ public class RundeckAdapter {
         options.put("project_id", project.key.toLowerCase());
         options.put("package_name", packageName);
         execution.setOptions(options);
-        try {
+        try {  //TODO SLA 145
             ExecutionsData data = 
         		client.callHttp(url, execution, null, false, RestClient.HTTP_VERB.POST, ExecutionsData.class);
 
@@ -191,11 +190,14 @@ public class RundeckAdapter {
           }
           else 
           {
-        	// someone is always logged in :)
-        	UserDetails details = crowdUserDetailsService.loadUserByToken(crowdCookie);  
-            logger.info("project id: {} details: {}", project.key, details);
-            options.put("project_admin", details.getUsername());
-          } 
+
+            options.put("project_admin", SecurityContextHolder.getContext().getAuthentication().getName());
+            //TODO stefanlack : fix replayment of following code
+            //UserDetails details = crowdUserDetailsService.loadUserByToken(crowdCookie);
+            //logger.info("project id: {} details: {}", project.key, details);
+            //options.put("project_admin", details.getUsername());
+
+          }
           execution.setOptions(options);
           
           ExecutionsData data = 

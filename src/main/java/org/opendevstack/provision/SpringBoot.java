@@ -14,8 +14,10 @@
 
 package org.opendevstack.provision;
 
+import org.opendevstack.provision.config.KeycloakSecurityConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Import;
 
 /**
  * Spring boot start class for the administration
@@ -23,6 +25,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Torsten Jaeschke
  */
 @SpringBootApplication
+@Import(KeycloakSecurityConfig.class)
 public class SpringBoot 
 {
 

@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.opendevstack.provision.adapter.IProjectIdentityMgmtAdapter;
 import org.opendevstack.provision.authentication.CustomAuthenticationManager;
+import org.opendevstack.provision.authentication.ProvisioningAppAuthenticationManager;
 import org.opendevstack.provision.model.ExecutionsData;
 import org.opendevstack.provision.model.ProjectData;
 import org.opendevstack.provision.model.jira.FullJiraProject;
@@ -94,7 +95,7 @@ public class ProjectApiController {
   
   // open for testing
   @Autowired
-  CustomAuthenticationManager manager;
+  ProvisioningAppAuthenticationManager manager;
 
   // open for testing
   @Value("${openshift.project.upgrade}")
