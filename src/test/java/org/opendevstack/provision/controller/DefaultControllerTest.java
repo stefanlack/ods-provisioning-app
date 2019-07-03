@@ -22,7 +22,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.opendevstack.provision.SpringBoot;
-import org.opendevstack.provision.authentication.CustomAuthenticationManager;
+import org.opendevstack.provision.authentication.crowd.CustomAuthenticationManager;
 import org.opendevstack.provision.authentication.TestAuthentication;
 import org.opendevstack.provision.model.AboutChangesData;
 import org.opendevstack.provision.services.*;

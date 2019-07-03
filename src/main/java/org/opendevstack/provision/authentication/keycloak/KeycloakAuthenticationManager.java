@@ -1,6 +1,8 @@
-package org.opendevstack.provision.authentication;
+package org.opendevstack.provision.authentication.keycloak;
 
 import org.opendevstack.provision.adapter.exception.IdMgmtException;
+import org.opendevstack.provision.authentication.ProvisioningAppAuthenticationManager;
+import org.opendevstack.provision.authentication.SessionAwarePasswordHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;

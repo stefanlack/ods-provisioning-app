@@ -122,7 +122,7 @@ dependencies {
 
     // keycloak
     implementation  'org.keycloak:keycloak-spring-boot-starter'
-    //compile "org.keycloak:keycloak-spring-security-adapter:${keycloakVersion}"
+  //  compile "org.keycloak:keycloak-spring-security-adapter:${keycloakVersion}"
 
     //frontend webjars
     compile 'org.webjars.bower:jquery:3.2.1'

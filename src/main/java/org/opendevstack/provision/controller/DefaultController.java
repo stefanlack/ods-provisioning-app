@@ -14,7 +14,6 @@
 
 package org.opendevstack.provision.controller;
 
-import org.opendevstack.provision.authentication.CustomAuthenticationManager;
 import org.opendevstack.provision.authentication.ProvisioningAppAuthenticationManager;
 import org.opendevstack.provision.services.*;
 import org.springframework.beans.factory.annotation.Autowired;

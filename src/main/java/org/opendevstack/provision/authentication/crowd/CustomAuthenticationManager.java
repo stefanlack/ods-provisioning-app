@@ -12,7 +12,7 @@
  * the License.
  */
 
-package org.opendevstack.provision.authentication;
+package org.opendevstack.provision.authentication.crowd;
 
 import com.atlassian.crowd.exception.*;
 import com.atlassian.crowd.integration.soap.SOAPGroup;
@@ -22,6 +22,8 @@ import com.atlassian.crowd.service.AuthenticationManager;
 import com.atlassian.crowd.service.soap.client.SecurityServerClient;
 import com.google.common.base.Preconditions;
 import org.opendevstack.provision.adapter.exception.IdMgmtException;
+import org.opendevstack.provision.authentication.ProvisioningAppAuthenticationManager;
+import org.opendevstack.provision.authentication.SessionAwarePasswordHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -4,17 +4,25 @@ import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.keycloak.adapters.springsecurity.KeycloakConfiguration;
 import org.keycloak.adapters.springsecurity.authentication.KeycloakAuthenticationProvider;
 import org.keycloak.adapters.springsecurity.config.KeycloakWebSecurityConfigurerAdapter;
+import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticatedActionsFilter;
+import org.keycloak.adapters.springsecurity.filter.KeycloakAuthenticationProcessingFilter;
+import org.keycloak.adapters.springsecurity.filter.KeycloakPreAuthActionsFilter;
+import org.keycloak.adapters.springsecurity.filter.KeycloakSecurityContextRequestFilter;
 import org.keycloak.adapters.springsecurity.management.HttpSessionManager;
+import org.opendevstack.provision.authentication.keycloak.KeycloakUserDetailsAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
@@ -42,9 +50,21 @@ public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter
   public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
     KeycloakAuthenticationProvider keycloakAuthenticationProvider =
         keycloakAuthenticationProvider();
+    auth.authenticationProvider(keycloakAuthenticationProvider);
+  }
+
+  @Bean(name = "authenticationManager")
+  @Override
+  public AuthenticationManager authenticationManagerBean() throws Exception {
+    return super.authenticationManagerBean();
+  }
+
+  @Override
+  protected KeycloakAuthenticationProvider keycloakAuthenticationProvider() {
+    KeycloakUserDetailsAuthenticationProvider keycloakAuthenticationProvider =
+        new KeycloakUserDetailsAuthenticationProvider();
     keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
-    auth.authenticationProvider(keycloakAuthenticationProvider)
-        .userDetailsService(userDetailsService());
+    return keycloakAuthenticationProvider;
   }
 
   @Bean
@@ -58,7 +78,6 @@ public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter
   protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
     return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
   }
-
 
   @Bean
   @Override
@@ -77,8 +96,7 @@ public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     super.configure(http);
-    http.authenticationProvider(keycloakAuthenticationProvider())
-        .authorizeRequests()
+    http.authorizeRequests()
         .antMatchers(LOGIN_URI)
         .permitAll()
         .anyRequest()
@@ -102,5 +120,37 @@ public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter
         .invalidateHttpSession(true)
         .deleteCookies("JSESSIONID")
         .permitAll();
+  }
+
+  @Bean
+  public FilterRegistrationBean keycloakAuthenticationProcessingFilterRegistrationBean(
+      KeycloakAuthenticationProcessingFilter filter) {
+    FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
+    registrationBean.setEnabled(false);
+    return registrationBean;
+  }
+
+  @Bean
+  public FilterRegistrationBean keycloakPreAuthActionsFilterRegistrationBean(
+      KeycloakPreAuthActionsFilter filter) {
+    FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
+    registrationBean.setEnabled(false);
+    return registrationBean;
+  }
+
+  @Bean
+  public FilterRegistrationBean keycloakAuthenticatedActionsFilterBean(
+      KeycloakAuthenticatedActionsFilter filter) {
+    FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
+    registrationBean.setEnabled(false);
+    return registrationBean;
+  }
+
+  @Bean
+  public FilterRegistrationBean keycloakSecurityContextRequestFilterBean(
+      KeycloakSecurityContextRequestFilter filter) {
+    FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
+    registrationBean.setEnabled(false);
+    return registrationBean;
   }
 }
