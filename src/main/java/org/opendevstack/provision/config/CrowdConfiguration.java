@@ -16,9 +16,6 @@ import com.atlassian.crowd.service.soap.client.SecurityServerClientImpl;
 import com.atlassian.crowd.service.soap.client.SoapClientPropertiesImpl;
 import com.ulisesbocchio.jasyptspringboot.annotation.EnableEncryptableProperties;
 import net.sf.ehcache.CacheManager;
-import org.codehaus.jackson.annotate.JsonAutoDetect;
-import org.opendevstack.provision.authentication.CustomAuthenticationManager;
-import org.opendevstack.provision.authentication.KeycloakAuthenticationManager;
 import org.opendevstack.provision.authentication.ProvisioningAppAuthenticationManager;
 import org.opendevstack.provision.filter.SSOAuthProcessingFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +43,6 @@ import java.util.Properties;
 @EnableEncryptableProperties
 public class CrowdConfiguration extends WebSecurityConfigurerAdapter {
 
-
-
   /**
    * Configure the security for the spring application
    *
@@ -56,15 +51,35 @@ public class CrowdConfiguration extends WebSecurityConfigurerAdapter {
    */
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.authenticationProvider(crowdAuthenticationProvider()).headers()
-            .httpStrictTransportSecurity().disable().and().cors().disable().csrf().disable()
-            .addFilter(crowdSSOAuthenticationProcessingFilter()).authorizeRequests()
-            .antMatchers("/", "/fragments/**", "/webjars/**", "/js/**", "/json/**", "/favicon.ico",
-                         "/login")
-            .permitAll().anyRequest().authenticated().and().formLogin().loginPage("/login").permitAll()
-            .defaultSuccessUrl("/home")
-            .and().logout().addLogoutHandler(crowdLogoutHandler()).permitAll();
+    http.authenticationProvider(crowdAuthenticationProvider())
+        .headers()
+        // TODO stefan lack: why scrf is disabled?
+        // TODO stefan lack: why we do not check groups (admin vs user)?
+        .httpStrictTransportSecurity()
+        .disable()
+        .and()
+        .cors()
+        .disable()
+        .csrf()
+        .disable()
+        .addFilter(crowdSSOAuthenticationProcessingFilter())
+        .authorizeRequests()
+        .antMatchers(
+            "/", "/fragments/**", "/webjars/**", "/js/**", "/json/**", "/favicon.ico", "/login")
+        .permitAll()
+        .anyRequest()
+        .authenticated()
+        .and()
+        .formLogin()
+        .loginPage("/login")
+        .permitAll()
+        .defaultSuccessUrl("/home")
+        .and()
+        .logout()
+        .addLogoutHandler(crowdLogoutHandler())
+        .permitAll();
   }
+
   @Value("${crowd.application.name}")
   String crowdApplicationName;
 
@@ -77,8 +92,7 @@ public class CrowdConfiguration extends WebSecurityConfigurerAdapter {
   @Value("${crowd.cookie.domain}")
   String cookieDomain;
 
-  @Autowired
-  private ProvisioningAppAuthenticationManager provisioningAppAuthenticationManager;
+  @Autowired private ProvisioningAppAuthenticationManager provisioningAppAuthenticationManager;
 
   /**
    * Get the properties used for crowd authentication
@@ -98,7 +112,6 @@ public class CrowdConfiguration extends WebSecurityConfigurerAdapter {
     prop.setProperty("cookie.domain", cookieDomain);
     return prop;
   }
-
 
   /**
    * Define a logout handler to perform a clean crowd logout
@@ -140,7 +153,7 @@ public class CrowdConfiguration extends WebSecurityConfigurerAdapter {
   @Bean
   public AuthenticationSuccessHandler authenticationSuccessHandler() {
     SavedRequestAwareAuthenticationSuccessHandler successHandler =
-            new SavedRequestAwareAuthenticationSuccessHandler();
+        new SavedRequestAwareAuthenticationSuccessHandler();
     successHandler.setDefaultTargetUrl("/home");
     successHandler.setUseReferer(true);
     successHandler.setAlwaysUseDefaultTargetUrl(true);
@@ -155,7 +168,7 @@ public class CrowdConfiguration extends WebSecurityConfigurerAdapter {
   @Bean
   public AuthenticationFailureHandler authenticationFailureHandler() {
     UsernameStoringAuthenticationFailureHandler failureHandler =
-            new UsernameStoringAuthenticationFailureHandler();
+        new UsernameStoringAuthenticationFailureHandler();
     failureHandler.setDefaultFailureUrl("/login?error=true");
     failureHandler.setUseForward(true);
     return failureHandler;
@@ -199,7 +212,6 @@ public class CrowdConfiguration extends WebSecurityConfigurerAdapter {
     factoryBean.setConfigLocation(new ClassPathResource("crowd-ehcache.xml"));
     return factoryBean;
   }
-
 
   /**
    * Define the authenticator for the secure client
@@ -262,7 +274,6 @@ public class CrowdConfiguration extends WebSecurityConfigurerAdapter {
     return cusd;
   }
 
-
   /**
    * Define the crowd authentication provider
    *
@@ -272,8 +283,8 @@ public class CrowdConfiguration extends WebSecurityConfigurerAdapter {
   @Bean
   RemoteCrowdAuthenticationProvider crowdAuthenticationProvider() throws IOException {
     AuthenticationManager authenticationManager = getAuthenticationManager();
-    return new RemoteCrowdAuthenticationProvider(authenticationManager, httpAuthenticator(),
-                                                 crowdUserDetailsService());
+    return new RemoteCrowdAuthenticationProvider(
+        authenticationManager, httpAuthenticator(), crowdUserDetailsService());
   }
 
   private AuthenticationManager getAuthenticationManager() {
