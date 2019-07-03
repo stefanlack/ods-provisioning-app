@@ -41,7 +41,7 @@ import java.util.Properties;
 @ConditionalOnProperty(name = "provision.auth.provider", havingValue = "crowd")
 @EnableCaching
 @EnableEncryptableProperties
-public class CrowdConfiguration extends WebSecurityConfigurerAdapter {
+public class CrowdSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
   /**
    * Configure the security for the spring application

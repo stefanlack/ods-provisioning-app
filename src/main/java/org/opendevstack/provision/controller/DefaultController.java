@@ -97,10 +97,10 @@ public class DefaultController {
     if (!isAuthenticated()) {
       return LOGIN_REDIRECT;
     } else {
-      // TODO SLA enable again
+
       model.addAttribute("jiraProjects", storageAdapter.listProjectHistory());
-      // TODO SLA enable again: rundeckAdapter
-      // model.addAttribute("quickStarter", rundeckAdapter.getQuickstarter());
+
+      model.addAttribute("quickStarter", rundeckAdapter.getQuickstarter());
       model.addAttribute("crowdUserGroup", crowdUserGroup.toLowerCase());
       model.addAttribute("crowdAdminGroup", crowdAdminGroup.toLowerCase());
       model.addAttribute("ocUpgradeAllowed", ocUpgradeAllowed);
