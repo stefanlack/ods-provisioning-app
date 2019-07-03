@@ -19,7 +19,7 @@
             </div>
             <div id="navbar" class="collapse navbar-collapse" sec:authorize="isAuthenticated()">
                 <ul class="nav navbar-nav">
-                    <li th:class="${classActiveHome}"><a th:href="@{/}">Overview</a></li>
+                    <li th:class="${classActiveHome}"><a th:href="@{/home}">Overview</a></li>
                     <li th:class="${classActiveNew}"><a th:href="@{/provision}">Provision</a></li>
                     <li th:class="${classActiveHistory}"><a th:href="@{/history}">History</a></li>
                     <li th:class="${classActiveAbout}"><a th:href="@{/about}">About</a></li>

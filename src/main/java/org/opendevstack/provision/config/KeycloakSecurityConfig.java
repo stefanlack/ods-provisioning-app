@@ -63,7 +63,8 @@ public class KeycloakSecurityConfig extends KeycloakWebSecurityConfigurerAdapter
   protected KeycloakAuthenticationProvider keycloakAuthenticationProvider() {
     KeycloakUserDetailsAuthenticationProvider keycloakAuthenticationProvider =
         new KeycloakUserDetailsAuthenticationProvider();
-    keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
+    //do not map authority A to ROLE_A. let it unchanged
+    // keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
     return keycloakAuthenticationProvider;
   }
 

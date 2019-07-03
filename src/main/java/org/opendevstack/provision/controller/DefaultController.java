@@ -101,10 +101,8 @@ public class DefaultController {
       model.addAttribute("jiraProjects", storageAdapter.listProjectHistory());
       // TODO SLA enable again: rundeckAdapter
       // model.addAttribute("quickStarter", rundeckAdapter.getQuickstarter());
-      if (isAuthProviderCrowd()) {
-        model.addAttribute("crowdUserGroup", crowdUserGroup.toLowerCase());
-        model.addAttribute("crowdAdminGroup", crowdAdminGroup.toLowerCase());
-      }
+      model.addAttribute("crowdUserGroup", crowdUserGroup.toLowerCase());
+      model.addAttribute("crowdAdminGroup", crowdAdminGroup.toLowerCase());
       model.addAttribute("ocUpgradeAllowed", ocUpgradeAllowed);
 
       model.addAttribute("projectTypes", projectTemplateKeyNames);
