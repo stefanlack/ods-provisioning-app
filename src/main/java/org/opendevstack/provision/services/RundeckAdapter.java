@@ -43,7 +43,7 @@ import org.springframework.stereotype.Service;
  * @author Torsten Jaeschke
  */
 @Service
-public class RundeckAdapter extends BaseServiceAdapter implements IJobExecutionAdapter {
+public class RundeckAdapter extends BaseServiceAdapter<B, B> implements IJobExecutionAdapter {
 
   private static final Logger logger = LoggerFactory.getLogger(RundeckAdapter.class);
 

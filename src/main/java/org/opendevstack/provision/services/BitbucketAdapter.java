@@ -14,19 +14,26 @@
 
 package org.opendevstack.provision.services;
 
+import static java.util.Collections.emptyList;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Preconditions;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-import org.apache.commons.lang.NotImplementedException;
+import java.util.stream.Collectors;
 import org.opendevstack.provision.adapter.IODSAuthnzAdapter;
 import org.opendevstack.provision.adapter.ISCMAdapter;
 import org.opendevstack.provision.model.OpenProjectData;
 import org.opendevstack.provision.model.bitbucket.BitbucketProject;
 import org.opendevstack.provision.model.bitbucket.BitbucketProjectData;
+import org.opendevstack.provision.model.bitbucket.PagedBitbucketProjects;
 import org.opendevstack.provision.model.bitbucket.Repository;
 import org.opendevstack.provision.model.bitbucket.RepositoryData;
 import org.opendevstack.provision.model.bitbucket.Webhook;
@@ -45,7 +52,7 @@ import org.springframework.stereotype.Service;
  * @author utschig
  */
 @Service
-public class BitbucketAdapter extends BaseServiceAdapter implements ISCMAdapter {
+public class BitbucketAdapter extends BaseServiceAdapter<PagedBitbucketProjects,BitbucketProject> implements ISCMAdapter {
 
   public BitbucketAdapter() {
     super("bitbucket");
@@ -345,9 +352,47 @@ public class BitbucketAdapter extends BaseServiceAdapter implements ISCMAdapter 
     return String.format(PROJECT_PATTERN, bitbucketUri, bitbucketApiPath);
   }
 
-  @Override
   public Map<String, String> getProjects(String filter) {
-    throw new NotImplementedException();
+    List<BitbucketProject> results = getProjectsWithFilter(getAdapterApiUri(), filter);
+    return results.stream()
+        .collect(Collectors.toMap(BitbucketProject::getKey, BitbucketProject::getName));
+  }
+
+
+
+  @Override
+  public Optional<BitbucketProject> loadProjectByFilter(String filter) {
+    String url = String.format("%s/%s", getAdapterApiUri(), filter);
+    RestClientCall call = httpGet().url(url).returnType(BitbucketProject.class);
+    try {
+      return Optional.of(restClient.execute(call));
+    } catch (IOException e) {
+      logGetException(url, e);
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  public PagedBitbucketProjects loadDataPage(String url, int start) {
+    RestClientCall call =
+        httpGet()
+            .url(url)
+            .queryParam("start", String.valueOf(start))
+            .returnTypeReference(new TypeReference<PagedBitbucketProjects>() {});
+    try {
+      return (PagedBitbucketProjects) restClient.execute(call);
+    } catch (IOException e) {
+      logGetException(url, e);
+      return new PagedBitbucketProjects(start, 0, 0, emptyList());
+    }
+  }
+
+  private void logGetException(String url, IOException e) {
+    if (e.getMessage().contains("NoSuchProjectException")) {
+      logger.info("No project found with rest call {}", url);
+    } else {
+      logger.error("Could not retrieve confluence spaces", e);
+    }
   }
 
   @Override

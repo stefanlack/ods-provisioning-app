@@ -170,6 +170,11 @@ public class RestClientCall {
     return this;
   }
 
+  public RestClientCall url(String urlFormat, Object ... args) {
+    this.url = String.format(urlFormat,args);
+    return this;
+  }
+
   public RestClientCall credentials(CredentialsInfo credentialsInfo) {
     this.credentialsInfo = credentialsInfo;
     return this;

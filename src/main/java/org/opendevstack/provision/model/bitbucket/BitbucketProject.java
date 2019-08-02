@@ -16,6 +16,8 @@ package org.opendevstack.provision.model.bitbucket;
 
 import javax.annotation.Generated;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * Bitbucket project model
@@ -55,6 +57,14 @@ public class BitbucketProject {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  @Override
+  public String toString() {
+    return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+        .append("key", key)
+        .append("name", name)
+        .toString();
   }
 
 }

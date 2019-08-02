@@ -14,6 +14,8 @@
 
 package org.opendevstack.provision.services;
 
+import static java.util.Collections.emptyMap;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Preconditions;
 import java.io.BufferedReader;
@@ -22,15 +24,18 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.NotImplementedException;
+import java.util.stream.Collectors;
 import org.opendevstack.provision.adapter.ICollaborationAdapter;
 import org.opendevstack.provision.adapter.IServiceAdapter;
 import org.opendevstack.provision.model.OpenProjectData;
 import org.opendevstack.provision.model.confluence.Blueprint;
 import org.opendevstack.provision.model.confluence.Context;
 import org.opendevstack.provision.model.confluence.JiraServer;
+import org.opendevstack.provision.model.confluence.LeanConfluenceSpace;
 import org.opendevstack.provision.model.confluence.Space;
 import org.opendevstack.provision.model.confluence.SpaceData;
+import org.opendevstack.provision.model.confluence.PagedConfluencSpaces;
+import org.opendevstack.provision.util.rest.RestClientCall;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +51,7 @@ import org.springframework.stereotype.Service;
  * @author Brokmeier, Pascal
  */
 @Service
-public class ConfluenceAdapter extends BaseServiceAdapter implements ICollaborationAdapter {
+public class ConfluenceAdapter extends BaseServiceAdapter<B, B> implements ICollaborationAdapter {
   private static final Logger logger = LoggerFactory.getLogger(ConfluenceAdapter.class);
 
   @Value("${confluence.api.path}")
@@ -181,8 +186,6 @@ public class ConfluenceAdapter extends BaseServiceAdapter implements ICollaborat
 
   List<Object> getSpaceTemplateList(String url, TypeReference reference) throws IOException {
 
-    //    return (List<Object>) restClient.callHttpTypeRef(url, null, false, RestClient.HTTP_VERB.GET,
-    //        reference);
     return (List<Object>) restClient.execute(httpGet().url(url).returnTypeReference(reference));
   }
 
@@ -257,7 +260,23 @@ public class ConfluenceAdapter extends BaseServiceAdapter implements ICollaborat
   }
 
   public Map<String, String> getProjects(String filter) {
-    throw new NotImplementedException();
+    logger.debug("Getting confluence projects (spaces) with filter {}", filter);
+    String spaceApi = String.format("%s%s/api/space", confluenceUri, confluenceApiPath);
+    String url =
+        filter == null || filter.trim().length() == 0
+            ? spaceApi
+            : String.format("%s/%s", spaceApi, filter);
+
+    RestClientCall call = httpGet().url(url).returnTypeReference(new TypeReference<PagedConfluencSpaces>() {});
+
+    try {
+      List<LeanConfluenceSpace> results = ((PagedConfluencSpaces) restClient.execute(call)).getData();
+      return results.stream()
+          .collect(Collectors.toMap(LeanConfluenceSpace::getKey, LeanConfluenceSpace::getName));
+    } catch (IOException e) {
+      logger.error("Could not retrieve confluence spaces", e);
+      return emptyMap();
+    }
   }
 
   @Override
@@ -293,8 +312,7 @@ public class ConfluenceAdapter extends BaseServiceAdapter implements ICollaborat
 
       project.collaborationSpaceUrl = null;
     } catch (Exception cex) {
-      logger.error(
-          "Could not clean up project {} -  error: {}", project.projectKey, cex);
+      logger.error("Could not clean up project {} -  error: {}", project.projectKey, cex);
       leftovers.put(CLEANUP_LEFTOVER_COMPONENTS.COLLABORATION_SPACE, 1);
     }
 

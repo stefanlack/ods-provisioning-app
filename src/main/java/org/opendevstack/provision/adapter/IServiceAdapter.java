@@ -49,7 +49,6 @@ public interface IServiceAdapter {
    * Return a list of project per adapter
    *
    * @param filter a filter (e.g. key), can be null
-   * @param crowdCookieValue the SSO cookie value
    * @return a map with project key and name, never null, but potentially empty
    */
   public Map<String, String> getProjects(String filter);

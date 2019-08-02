@@ -45,7 +45,7 @@ import org.springframework.stereotype.Service;
  *     https://ecosystem.atlassian.net/wiki/display/JRJC/
  */
 @Service
-public class JiraAdapter extends BaseServiceAdapter implements IBugtrackerAdapter {
+public class JiraAdapter extends BaseServiceAdapter<B, B> implements IBugtrackerAdapter {
 
   private static final Logger logger = LoggerFactory.getLogger(JiraAdapter.class);
 
