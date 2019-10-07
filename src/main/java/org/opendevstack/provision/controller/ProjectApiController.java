@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import org.opendevstack.provision.adapter.IBugtrackerAdapter;
 import org.opendevstack.provision.adapter.ICollaborationAdapter;
 import org.opendevstack.provision.adapter.IJobExecutionAdapter;
@@ -241,32 +240,25 @@ public class ProjectApiController {
       }
       if (component_name.isEmpty()) continue;
       // Check correct naming
-      if (isNamingComponentTypeCorrect(component_name, component_id)) {
+      if (isComponentTypeNamingCorrect(component_name, component_id)) {
         filteredQuickstarters.add(quickstarter_option);
       }
     }
     return filteredQuickstarters;
   }
 
-  private boolean isNamingComponentTypeCorrect(String component_name, String component_id) {
-    /**
-     * Checks if component to be created has been named properly.
-     *
-     * @param component_name: component (quickstarter) name in the Provision application DB
-     * @param component_id: user input name for a quickstarter generated component
-     * @return boolean value
-     */
-    List<ComponentNamingRules> namingRules =
-        this.quickstartersNamingRules.stream()
-            .filter((r) -> r.getName().equals(component_name))
-            .collect(Collectors.toList());
-    for (ComponentNamingRules rules : namingRules) {
-      if (!rules.filter(component_id)) {
-        return false;
-      }
-      ;
-    }
-    return true;
+  /**
+   * Checks if component to be created has been named properly.
+   *
+   * @param componentName: component (quickstarter) name in the Provision application DB
+   * @param componentId: user input name for a quickstarter generated component
+   * @return boolean value
+   */
+  boolean isComponentTypeNamingCorrect(String componentName, String componentId) {
+
+    return this.quickstartersNamingRules.stream()
+        .filter(r -> r.getName().equals(componentName))
+        .allMatch(rules -> rules.isValidComponentId(componentId));
   }
 
   /**

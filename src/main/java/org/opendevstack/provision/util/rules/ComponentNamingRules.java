@@ -22,9 +22,9 @@ public class ComponentNamingRules {
     this.rules = rules;
   }
 
-  public boolean filter(String componentName) {
+  public boolean isValidComponentId(String componentIdCandidate) {
     return !this.rules.stream()
-        .map((namingRule -> namingRule.filter(componentName)))
+        .map(namingRule -> namingRule.isValidName(componentIdCandidate))
         .anyMatch((res) -> res == false);
   }
 }

@@ -41,8 +41,14 @@ public class NamingRule {
     this.errorMessage = errorMessage;
   }
 
-  public boolean filter(String name) {
-    Matcher m = Pattern.compile(this.reg).matcher(name);
+  /**
+   * determines whether the candidateName is a valid name according this rule
+   *
+   * @param candidateName the name to check
+   * @return the result
+   */
+  public boolean isValidName(String candidateName) {
+    Matcher m = Pattern.compile(this.reg).matcher(candidateName);
     return this.not ? !m.find() : m.find();
   }
 }

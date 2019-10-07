@@ -14,6 +14,7 @@
 
 package org.opendevstack.provision.controller;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
@@ -40,6 +41,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -665,6 +667,38 @@ public class E2EProjectAPIControllerTest {
 
     // verify 2 quickstarters are there
     assertEquals(2, resultLegacyProject.quickstarters.size());
+  }
+
+  @Test
+  public void testQuickstarterNamingFeAngular() {
+    checkValidName("fe_angular", "xy-valid");
+    checkValidName("fe_angular", "xyvalid");
+    checkInvalidName("fe_angular", "xy-1valid");
+  }
+
+  @Test
+  @Ignore(
+      "TODO test failes with java.util.regex.PatternSyntaxException: Illegal repetition near index 2")
+  // TODO test failes with java.util.regex.PatternSyntaxException: Illegal repetition near index 2
+  public void testQuickstarterNamingBeNodeExpress() {
+    checkValidName("be-node-express", "helloworld");
+    checkInvalidName("be-node-express", "Helloworld");
+  }
+
+  private void checkValidName(String componentName, String componentIdCandidate) {
+    assertThat(apiController.isComponentTypeNamingCorrect(componentName, componentIdCandidate))
+        .as(
+            "ComponentId '%s'  is valid according to rule for component '%s'",
+            componentIdCandidate, componentName)
+        .isTrue();
+  }
+
+  private void checkInvalidName(String componentName, String componentIdCandidate) {
+    assertThat(apiController.isComponentTypeNamingCorrect(componentName, componentIdCandidate))
+        .as(
+            "ComponentId '%s'  is not valid according to rule for component '%s'",
+            componentIdCandidate, componentName)
+        .isFalse();
   }
 
   /*

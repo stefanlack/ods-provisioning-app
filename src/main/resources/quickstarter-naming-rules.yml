@@ -4,7 +4,7 @@ rules:
   - reg: -\d
     not: true
     description: No digits should follow '-' sign
-    errorMessage: Angular does not support '-' dirrectly followed by the number
+    errorMessage: Angular does not support '-' directly followed by the number
 ---
 name: be-node-express
 rules:

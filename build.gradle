@@ -183,6 +183,9 @@ dependencies {
     compile group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.4'
     compile group: 'com.google.guava', name: 'guava', version: '23.0'
 
+    testCompile group: 'org.assertj', name: 'assertj-core', version: '3.13.2'
+
+
 }
 
 bootJar {
